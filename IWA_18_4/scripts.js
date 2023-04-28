@@ -31,15 +31,24 @@ const handleDragOver = (event) => {
     updateDragging.html({ over: column })
 }
 
-
-const handleDragStart = (event) => {}
+function handleDragStart(event) { }
 const handleDragEnd = (event) => {}
-const handleHelpToggle = (event) => {}
-const handleAddToggle = (event) => {}
+const handleHelpToggle = (event) => {
+    html.help.overlay.style.display = "block"
+}
+const handleHelpCancel = (event) => {
+    html.help.cancel.style.display = "none"
+    html.other.help.focus()
+}
+const handleAddToggle = (event) => {
+    html.add.overlay.style.display = "block"
+}
 const handleAddSubmit = (event) => {}
 const handleEditToggle = (event) => {}
 const handleEditSubmit = (event) => {}
-const handleDelete = (event) => {}
+const handleDelete = (event) => {
+
+}
 
 html.add.cancel.addEventListener('click', handleAddToggle)
 html.other.add.addEventListener('click', handleAddToggle)
