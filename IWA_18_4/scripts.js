@@ -1,3 +1,7 @@
+
+import {TABLES, COLUMNS, state, createOrderData, updateDragging } from "./data.js";
+import { createOrderHtml, html, moveToColumn} from "./view.js";
+
 /**
  * A handler that fires when a user drags over any element inside a column. In
  * order to determine which column the user is dragging over the entire event
@@ -24,7 +28,7 @@ const handleDragOver = (event) => {
 
     if (!column) return
     updateDragging({ over: column })
-    updateDraggingHtml({ over: column })
+    updateDragging.html({ over: column })
 }
 
 
@@ -57,3 +61,4 @@ for (const htmlColumn of Object.values(html.columns)) {
 for (const htmlArea of Object.values(html.area)) {
     htmlArea.addEventListener('dragover', handleDragOver)
 }
+
