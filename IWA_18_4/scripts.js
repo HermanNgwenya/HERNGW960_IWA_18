@@ -1,6 +1,6 @@
 
 import {TABLES, COLUMNS, state, createOrderData, updateDragging } from "./data.js";
-import { createOrderHtml, html, moveToColumn} from "./view.js";
+import { createOrderHtml, html, moveToColumn, updateDraggingHtml} from "./view.js";
 
 /**
  * A handler that fires when a user drags over any element inside a column. In
@@ -28,29 +28,102 @@ const handleDragOver = (event) => {
 
     if (!column) return
     updateDragging({ over: column })
-    updateDragging.html({ over: column })
+    updateDraggingHtml({ over: column })
 }
 
-function handleDragStart(event) { }
-const handleDragEnd = (event) => {}
+let dragged;
+const handleDragStart = (event) => { 
+     dragged = event.target;
+};
+
+function handleDragDrop (event) {
+    event.target.append(dragged);
+}
+
+const handleDragEnd = (event) => {
+     const background = event.target.closest("section");
+     background.style.backgroundColor = "";
+};
+
 const handleHelpToggle = (event) => {
     html.help.overlay.style.display = "block"
 }
 const handleHelpCancel = (event) => {
-    html.help.cancel.style.display = "none"
-    html.other.help.focus()
+    html.help.overlay.style.display = "none"
+    html.other.add.focus()
+   
 }
 const handleAddToggle = (event) => {
     html.add.overlay.style.display = "block"
+    html.other.add.focus()
 }
-const handleAddSubmit = (event) => {}
-const handleEditToggle = (event) => {}
-const handleEditSubmit = (event) => {}
+const handleAddCancel = () => {
+    html.add.overlay.style.display = "none"
+    html.other.add.focus()
+}
+const handleAddSubmit = (event) => {
+    event.preventDefault();
+    const overlay = html.add.overlay;
+    const formData = new FormData(event.target);
+    const data = Object.fromEntries(formData);
+    const newData = createOrderData(data);
+    const htmlData = createOrderHtml(newData);
+    const append = document.querySelector('[data-area="ordered"]');
+    event.target.reset();
+    overlay.close();
+    append.appendChild(htmlData);
+
+};
+
+const handleEditToggle = (event) => {
+    const overlay = html.edit.overlay;
+    const cancelButton = html.edit.cancel;
+    const input = html.edit.title;
+    const select = html.edit.table;
+    const option = html.edit.column;
+    event.target.dataset.id ? overlay.show() : undefined;
+    const id = event.target.dataset.id ? event.target.dataset.id : undefined;
+    input.value = event.target.dataset.id
+        ? event.target.querySelector(".order__title").textContent
+        : undefined;
+    select.value = event.target.dataset.id
+        ? event.target.querySelector(".order__value").textContent
+        : undefined;
+    let section = document.querySelector(`[data-id="${id}"]`);
+    option.value = section ? section.closest("section").dataset.area : "";
+    if (event.target === cancelButton) {
+        overlay.close();
+    }
+    html.edit.delete.id = id;
+};
+    
+const handleEditSubmit = (event) => {
+    event.preventDefault();
+    const idRemove = html.edit.delete.id;
+    const orderDelete = document.querySelector(`[data-id="${idRemove}"]`);
+    orderDelete.remove();
+    const overlay = html.edit.overlay;
+    const formData = new FormData(event.target);
+    const data = Object.fromEntries(formData);
+    const newData = createOrderData(data);
+    const htmlData = createOrderHtml(newData);
+    const appended = document.querySelector(`[data-area="${newData.column}"]`);
+    appended.appendChild(htmlData);
+    event.target.reset();
+    overlay.close();
+}
+
 const handleDelete = (event) => {
-
+    const idToBeDeleted = html.edit.delete.id;
+    const orderToBeDeleted = document.querySelector(
+        `[data-id="${idToBeDeleted}"]`
+    );
+    const overlay = html.edit.overlay;
+    orderToBeDeleted.remove();
+    overlay.close();
 }
 
-html.add.cancel.addEventListener('click', handleAddToggle)
+html.add.cancel.addEventListener('click', handleAddCancel)
 html.other.add.addEventListener('click', handleAddToggle)
 html.add.form.addEventListener('submit', handleAddSubmit)
 
@@ -59,15 +132,13 @@ html.edit.cancel.addEventListener('click', handleEditToggle)
 html.edit.form.addEventListener('submit', handleEditSubmit)
 html.edit.delete.addEventListener('click', handleDelete)
 
-html.help.cancel.addEventListener('click', handleHelpToggle)
+html.help.cancel.addEventListener('click', handleHelpCancel)
 html.other.help.addEventListener('click', handleHelpToggle)
 
-for (const htmlColumn of Object.values(html.columns)) {
-    htmlColumn.addEventListener('dragstart', handleDragStart)
-    htmlColumn.addEventListener('dragend', handleDragEnd)
-}
-
 for (const htmlArea of Object.values(html.area)) {
-    htmlArea.addEventListener('dragover', handleDragOver)
+   htmlArea.addEventListener('dragover', handleDragOver) 
+   htmlArea.addEventListener('dragstart', handleDragStart)
+   htmlArea.addEventListener('drop', handleDragDrop)
+   htmlArea.addEventListener('dragend', handleDragEnd)
 }
 
