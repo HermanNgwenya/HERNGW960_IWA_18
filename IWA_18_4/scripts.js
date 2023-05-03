@@ -31,6 +31,8 @@ const handleDragOver = (event) => {
     updateDraggingHtml({ over: column })
 }
 
+
+// dragging 
 let dragged;
 const handleDragStart = (event) => { 
      dragged = event.target;
@@ -61,6 +63,8 @@ const handleAddCancel = () => {
     html.add.overlay.style.display = "none"
     html.other.add.focus()
 }
+
+// I fixed my code and i added elements that were missing to enable the add funtion on the app to create orders.
 const handleAddSubmit = (event) => {
     event.preventDefault();
     const overlay = html.add.overlay;
@@ -75,6 +79,7 @@ const handleAddSubmit = (event) => {
 
 };
 
+// I added this code to enable the edit function in the app to edit orders
 const handleEditToggle = (event) => {
     const overlay = html.edit.overlay;
     const cancelButton = html.edit.cancel;
